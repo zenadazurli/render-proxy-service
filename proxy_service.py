@@ -1,5 +1,6 @@
 from flask import Flask, request, Response
 import requests
+import os
 
 app = Flask(__name__)
 
@@ -11,7 +12,6 @@ proxies = {"http": PROXY, "https": PROXY}
 def proxy(path):
     target_url = f"https://{path}" if path else "https://api.ipify.org"
     
-    # Inoltra la richiesta a FusionProxy
     resp = requests.request(
         method=request.method,
         url=target_url,
@@ -22,11 +22,11 @@ def proxy(path):
         allow_redirects=False
     )
     
-    # Restituisci la risposta
     response = Response(resp.content, status=resp.status_code)
     for k, v in resp.headers.items():
         response.headers[k] = v
     return response
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
